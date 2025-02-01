@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ar" dir="rtl">
+<head>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .footer {
+            background-color: #343a40;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+
+        /* Adjust text alignment for RTL */
+        .table th, .table td {
+            text-align: right;
+        }
+
+        .btn {
+            direction: rtl;
+        }
+
+    </style>
+    <title>قائمة المرضى</title>
+</head>
+<body>
+<!-- Navbar -->
+
+<div th:replace="admin/layout/navbar :: navbar"></div>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-3">
+            <div th:replace="admin/layout/sidebar :: sidebar"></div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-9">
+            <h1 class="mt-4">قائمة المرضى</h1>
+
+            <!-- Success Message -->
+            <div th:if="${message}" class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+                <span th:text="${message}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
+            <!-- Error Message -->
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+                <span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
+            <!-- Search Form -->
+            <form th:action="@{/admin/patients/search}" method="get" class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <label for="mobile"></label>
+                    <input type="text" id="mobile" name="mobile" class="form-control" placeholder="ابحث برقم الهاتف">
+                </div>
+                <div class="col-md-6 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary">بحث</button>
+                </div>
+            </form>
+
+            <!-- Patients Table -->
+            <table class="table table-striped mt-3">
+                <thead class="table-dark">
+                <tr>
+                    <th>الرقم</th>
+                    <th>الاسم</th>
+                    <th>رقم الهاتف</th>
+                    <th>الإجراءات</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="patient : ${patients}">
+                    <td th:text="${patient.id}"></td>
+                    <td th:text="${patient.name}"></td>
+                    <td th:text="${patient.mobile}"></td>
+                    <td>
+                        <a th:href="@{/admin/patients/add?patientId={id}(id=${patient.id})}" class="btn btn-primary btn-sm">تعديل</a>
+                        <!-- Delete Button: Triggers the Delete Confirmation Modal -->
+                        <a th:href="@{/admin/patients/delete/{id}(id=${patient.id})}" class="btn btn-danger btn-sm"
+                           onclick="return confirm('هل أنت متأكد من حذف هذا المريض؟')">حذف</a>
+
+                        <a th:href="@{/admin/patients/profile/{id}(id=${patient.id})}" class="btn btn-secondary btn-sm">الملف الشخصي</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+            <!-- Add New Patient Button -->
+            <a href="/admin/patients/add" class="btn btn-primary mt-3">إضافة مريض جديد</a>
+        </div>
+
+    </div>
+</div>
+
+<footer class="footer">
+    <p>© 2024 نظام العيادة. جميع الحقوق محفوظة.</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+
+
+</body>
+</html>

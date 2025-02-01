@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ar" dir="rtl">
+<head>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .footer {
+            background-color: #343a40;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+
+        /* Adjust text alignment for RTL */
+        .table th, .table td {
+            text-align: right;
+        }
+
+        .btn {
+            direction: rtl;
+        }
+    </style>
+    <title>قائمة المرضى</title>
+</head>
+<body>
+<!-- Navbar -->
+<div th:replace="admin/layout/navbar :: navbar"></div>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-3">
+            <div th:replace="admin/layout/sidebar :: sidebar"></div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-9">
+            <h1 class="mt-4">قائمة الحجوزات</h1>
+
+            <!-- Search Form -->
+            <form th:action="@{/admin/patients/search}" method="get" class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <label for="mobile"></label><input type="text" id="mobile" name="mobile" class="form-control" placeholder="ابحث برقم الهاتف">
+                </div>
+                <div class="col-md-6 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary">بحث</button>
+                </div>
+            </form>
+            <!-- Patients Table -->
+            <table class="table table-striped mt-3">
+                <thead class="table-dark">
+                <tr>
+                    <th>الدور</th>
+                    <th>الاسم</th>
+                    <th>رقم الهاتف</th>
+                    <th>تاريخ الحجز</th>
+                    <th>اليوم</th> <!-- Added 'اليوم' column -->
+                    <th>اسم العيادة</th>
+                    <th>النوع</th> <!-- Added 'type' column -->
+                    <th>الإجراءات</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="reservation : ${reservations}">
+                    <td th:text="${reservation.turn}"></td>
+                    <td th:text="${reservation.patient.name}"></td>
+                    <td th:text="${reservation.patient.mobile}"></td>
+                    <td th:text="${reservation.date}"></td>
+                    <td th:text="${reservation.dayOfWeek}"></td>
+                    <td th:text="${reservation.clinicName}"></td>
+                    <td th:text="${reservation.type}"></td> <!-- Display 'type' -->
+                    <td>
+                        <a href="#" class="btn btn-primary btn-sm">تعديل</a>
+                        <a href="#" class="btn btn-danger btn-sm">حذف</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+            <!-- Add New Patient Button -->
+            <a href="/admin/reservations/add" class="btn btn-primary mt-3">إضافة حجز جديد</a>
+
+        </div>
+
+    </div>
+</div>
+
+<footer class="footer">
+    <p>© 2024 نظام العيادة. جميع الحقوق محفوظة.</p>
+</footer>
+
+<!-- Bootstrap JS and dependencies -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,68 @@
+<html xmlns:th="http://www.thymeleaf.org" lang="ar" dir="rtl">
+<head>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .footer {
+            background-color: #343a40;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+    <title>إضافة أو تعديل مريض</title>
+</head>
+<body>
+<!-- Navbar -->
+<div th:replace="admin/layout/navbar :: navbar"></div>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-3">
+            <div th:replace="admin/layout/sidebar :: sidebar"></div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-9">
+            <h1 class="mt-4" th:text="${patient.id == null ? 'إضافة مريض جديد' : 'تعديل بيانات المريض'}"></h1>
+
+            <!-- Patient Form -->
+            <form th:action="@{/admin/patients/}" method="post">
+                <div class="form-group mb-3">
+                    <label for="name">اسم المريض</label>
+                    <input type="text" id="name" name="name" class="form-control" th:value="${patient.name}" required>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="mobile">رقم الهاتف</label>
+                    <input type="text" id="mobile" name="mobile" class="form-control" th:value="${patient.mobile}" required>
+                </div>
+
+
+
+                <input type="hidden" th:value="${patient.id}" name="id" /> <!-- Hidden field for editing -->
+
+                <button type="submit" class="btn btn-primary mt-3">
+                    <span th:text="${patient.id == null ? 'إضافة مريض' : 'تحديث بيانات المريض'}"></span>
+                </button>
+            </form>
+
+            <br>
+
+            <a href="/admin/patients/" class="btn btn-secondary mt-3">رجوع إلى قائمة المرضى</a>
+        </div>
+    </div>
+</div>
+
+<footer class="footer">
+    <p>© 2024 نظام العيادة. جميع الحقوق محفوظة.</p>
+</footer>
+
+<!-- Bootstrap JS and dependencies -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

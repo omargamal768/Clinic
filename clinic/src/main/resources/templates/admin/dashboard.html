@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .footer {
+            background-color: #343a40;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+
+        .container-fluid {
+            direction: rtl;
+        }
+
+        .card {
+            margin-bottom: 1.5rem;
+        }
+        .card:hover {
+            transform: scale(1.05);
+            transition: transform 0.3s ease;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .form-section {
+            background-color: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-section h2 {
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .form-control {
+            margin-bottom: 1rem;
+        }
+    </style>
+    <title>لوحة التحكم</title>
+</head>
+<body>
+
+<!-- Navbar -->
+<div th:replace="admin/layout/navbar :: navbar"></div>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-3">
+            <div th:replace="admin/layout/sidebar :: sidebar"></div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-9">
+            <h1 class="mt-4">لوحة التحكم</h1>
+
+            <!-- Date Range Picker Form -->
+            <div class="form-section">
+                <h2>تحديد الفترة الزمنية</h2>
+                <form id="dateRangeForm">
+                    <div class="row">
+                        <div class="col-md-5">
+                            <label for="startDate">من تاريخ:</label>
+                            <input type="date" id="startDate" class="form-control" required style="text-align: right; direction: rtl;">
+                        </div>
+                        <div class="col-md-5">
+                            <label for="endDate">إلى تاريخ:</label>
+                            <input type="date" id="endDate" class="form-control" required style="text-align: right; direction: rtl;">
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary mt-4">تصفية</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Cards Display -->
+            <div class="row mt-4">
+                <!-- Total Patients Card -->
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">عدد المرضى الكلي</h5>
+                            <p class="card-text fs-2" id="totalPatients">0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Total "كشف" Reservations Card -->
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">عدد الحجوزات بنوع كشف</h5>
+                            <p class="card-text fs-2" id="consultationReservations">0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Total "استشارة" Reservations Card -->
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">عدد الحجوزات بنوع استشارة</h5>
+                            <p class="card-text fs-2" id="followUpReservations">0</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="footer">
+    <p>© 2024 نظام العيادة. جميع الحقوق محفوظة.</p>
+</footer>
+
+<!-- Bootstrap JS and dependencies -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+
+    // Sample data for patients and reservations
+    const patients = [
+        {
+            id: 1,
+            name: 'عمر جمال الدين',
+            mobile: '+201114899956',
+            reservations: [
+                {
+                    id: 1,
+                    turn: 1,
+                    date: '2025-01-29',
+                    clinicName: 'clinic',
+                    type: 'كشف',
+                    dayOfWeek: 'Wednesday',
+                },
+                {
+                    id: 2,
+                    turn: 2,
+                    date: '2025-02-02',
+                    clinicName: 'clinic',
+                    type: 'استشارة',
+                    dayOfWeek: 'Sunday',
+                },
+                {
+                    id: 3,
+                    turn: 3,
+                    date: '2025-02-05',
+                    clinicName: 'Dental Clinic',
+                    type: 'كشف',
+                    dayOfWeek: 'Wednesday',
+                },
+                {
+                    id: 4,
+                    turn: 4,
+                    date: '2025-02-10',
+                    clinicName: 'Heart Clinic',
+                    type: 'استشارة',
+                    dayOfWeek: 'Monday',
+                },
+                {
+                    id: 5,
+                    turn: 5,
+                    date: '2025-02-15',
+                    clinicName: 'Eye Clinic',
+                    type: 'كشف',
+                    dayOfWeek: 'Saturday',
+                }
+            ]
+        }
+    ];
+
+    // Function to filter reservations by date range
+    // Function to filter reservations by date range
+    function filterReservations(startDate, endDate) {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+
+        return patients[0].reservations.filter(reservation => {
+            const reservationDate = new Date(reservation.date);
+            return reservationDate >= start && reservationDate <= end;
+        });
+    }
+
+    // Function to update reservation count and patient count
+    function updateDashboard(startDate = null, endDate = null) {
+        let filteredReservations = patients[0].reservations;
+
+        // Filter reservations if dates are provided
+        if (startDate && endDate) {
+            filteredReservations = filterReservations(startDate, endDate);
+        }
+
+        // Handle empty state
+        if (filteredReservations.length === 0) {
+            alert('لا توجد حجوزات في الفترة الزمنية المحددة.');
+        }
+
+        // Calculate totals
+        const totalPatients = patients.length;
+        const totalConsultationReservations = filteredReservations.filter(reservation => reservation.type === 'كشف').length;
+        const totalFollowUpReservations = filteredReservations.filter(reservation => reservation.type === 'استشارة').length;
+
+        // Update the cards with the filtered data
+        document.getElementById('totalPatients').innerText = totalPatients;
+        document.getElementById('consultationReservations').innerText = totalConsultationReservations;
+        document.getElementById('followUpReservations').innerText = totalFollowUpReservations;
+    }
+
+    // Event listener for the form submission
+    document.getElementById('dateRangeForm').addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+
+        // Validate date inputs
+        if (!startDate || !endDate) {
+            alert('يرجى إدخال كلا التاريخين!');
+            return;
+        }
+
+        if (new Date(startDate) > new Date(endDate)) {
+            alert('تاريخ البداية لا يمكن أن يكون بعد تاريخ النهاية!');
+            return;
+        }
+
+        // Update dashboard with filtered data
+        updateDashboard(startDate, endDate);
+    });
+
+    // Initial update of the dashboard
+    window.onload = () => {
+        updateDashboard();
+    };
+</script>
+
+    </body>
+</html>

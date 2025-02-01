@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ar" dir="rtl">
+<head>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .navbar-brand img {
+            max-height: 40px; /* Adjust logo size */
+        }
+
+        .navbar-title {
+            font-size: 2rem;
+            font-weight: bold;
+            color: white;
+            text-align: center;
+            width: 100%;
+            padding-left: 15px; /* Add some left padding for alignment */
+        }
+
+        .profile-name {
+            color: white;
+            font-weight: bold;
+        }
+
+        .navbar-nav {
+            margin-right: auto; /* Align profile section to the left */
+        }
+
+        .navbar-toggler {
+            border-color: white;
+        }
+
+        .navbar-dark .navbar-toggler-icon {
+            background-color: white;
+        }
+    </style>
+    <title></title>
+</head>
+<body>
+<div th:fragment="navbar">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <!-- Logo (optional) -->
+
+            <!-- Title Centered -->
+            <div class="navbar-title">
+                <span>عيادة الدكتور جمال ابو رجيلة</span>
+            </div>
+
+            <!-- Toggler Button for Mobile -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Profile Section (Left side) -->
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle profile-name" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                            <span th:text="${username}"></span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="/profile" th:href="@{/admin/profile}">عرض الملف الشخصي</a></li>
+                            <li><a class="dropdown-item" href="/settings" th:href="@{/admin/settings}">الإعدادات</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form th:action="@{/admin/logout}" method="post" style="margin: 0;">
+                                    <button type="submit" class="dropdown-item">تسجيل الخروج</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

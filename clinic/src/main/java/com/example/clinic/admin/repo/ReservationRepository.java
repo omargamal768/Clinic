@@ -1,0 +1,24 @@
+package com.example.clinic.admin.repo;
+
+import com.example.clinic.admin.model.Reservation;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
+
+import java.time.LocalDate;
+import java.util.List;
+
+@Repository
+public interface ReservationRepository extends JpaRepository<Reservation, Long> {
+    List<Reservation> findByPatientId(Long patientId);
+    // Custom queries can go here
+    // Check if a patient has a reservation on the same date
+    boolean existsByPatientIdAndDate(Long patientId, LocalDate date);
+
+    // Check if a turn is already taken on the specific date
+    boolean existsByTurnAndDate(int turn, LocalDate date);
+
+    @Query("SELECT r.turn FROM Reservation r WHERE r.date = :date")
+    List<Integer> findReservedTurnsByDate(LocalDate date);
+    long countByDateBetween(LocalDate startDate, LocalDate endDate);
+}

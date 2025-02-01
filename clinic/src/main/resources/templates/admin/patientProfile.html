@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+        }
+
+        .footer {
+            background-color: #343a40;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+
+        .table th, .table td {
+            text-align: right;
+        }
+
+        h1, h2 {
+            color: #007bff;
+        }
+
+        .card {
+            margin-top: 20px;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+        }
+
+
+        .tracking-bar {
+            display: flex;
+            align-items: center;
+            position: relative;
+            justify-content: space-between; /* Spread steps evenly across the bar */
+            width: 100%; /* Full width of the container */
+            padding: 0 10px;
+        }
+
+        .tracking-bar::before {
+            content: '';
+            position: absolute;
+            top: 50%; /* Align the line to the center of the circles */
+            left: 0;
+            right: 0;
+            height: 4px; /* Thickness of the connecting line */
+            background-color: #ccc; /* Default line color */
+            z-index: 0; /* Place it behind the circles */
+        }
+
+        .tracking-step {
+            position: relative;
+            text-align: center;
+            z-index: 1; /* Bring circles above the line */
+        }
+
+        .tracking-step .circle {
+            width: 30px;
+            height: 30px;
+            line-height: 30px;
+            border-radius: 50%;
+            background-color: #ccc; /* Default circle color */
+            color: #fff;
+            font-size: 14px;
+            font-weight: bold;
+            margin: 0 auto 5px; /* Center the circle and add spacing below */
+            z-index: 1;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; /* Smooth hover effect */
+        }
+
+        /* Completed steps */
+        .tracking-step.completed .circle {
+            background-color: #4caf50; /* Color for completed steps */
+        }
+
+        /* Hover effect only for completed steps */
+        .tracking-step.completed:hover .circle {
+            transform: scale(1.1); /* Slightly enlarge the circle on hover */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* Add shadow for emphasis */
+        }
+
+
+        /* Prevent hover effect from affecting the bar */
+        .tracking-bar:hover {
+            pointer-events: none; /* Disable hover effect for the entire bar */
+        }
+
+        .tracking-step:hover {
+            pointer-events: auto; /* Allow hover only on individual steps */
+        }
+    </style>
+    <title> الملف المرضي</title>
+</head>
+<body>
+
+<!-- Navbar -->
+<div th:replace="admin/layout/navbar :: navbar"></div>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-lg-3">
+            <div th:replace="admin/layout/sidebar :: sidebar"></div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-lg-9">
+            <h1 class="mt-4">الملف المرضي</h1>
+
+            <!-- Tracking Bar -->
+            <div class="tracking-bar">
+
+                <div id="tracking-step-1" class="tracking-step completed">
+                    <div class="circle">1</div>
+                    <div class="tracking-title completed">ارسال عنوان العيادة والموقع الالكتروني</div>
+                </div>
+
+                <div id="tracking-step-2" class="tracking-step" th:classappend="${hasKashfReservation ? ' completed' : ''}">
+                    <div class="circle">2</div>
+                    <div class="tracking-title" th:text="' حجز كشف'"></div>
+                </div>
+                <div id="tracking-step-3" class="tracking-step" th:classappend="${hasLabs ? ' completed' : ''}">
+                    <div class="circle">3</div>
+                    <div class="tracking-title ">طلب أشعة وتحاليل</div>
+                </div>
+
+                <div class="tracking-step" th:classappend="${hasKKashfReservation ? ' completed' : ''}">
+                    <div class="circle">2</div>
+                    <div class="tracking-title" th:text="'تم حجز استشارة'"></div>
+                </div>
+
+
+
+
+            </div>
+
+            <!-- Patient Details Section -->
+            <div id="patient-details"  class="card mt-4">
+                <div class="card-header bg-primary text-white">
+                    تفاصيل المريض
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered">
+                        <tbody>
+                        <tr>
+                            <th>الرقم</th>
+                            <td th:text="${patient.id}"></td>
+                        </tr>
+                        <tr>
+                            <th>الاسم</th>
+                            <td th:text="${patient.name}"></td>
+                        </tr>
+                        <tr>
+                            <th>رقم الهاتف</th>
+                            <td>
+                                <span th:text="${patient.mobile}"></span>
+                                <a th:href="'https://wa.me/' + ${patient.mobile} + '?text=https://www.google.com/maps/dir//3+Damanhour,+El-Bostan,+Heliopolis,+Cairo+Governorate+4460321/@30.0965294,31.2486324,12z/data=!3m1!4b1!4m8!4m7!1m0!1m5!1m1!1s0x1458158b558c7af3:0x1c8e3cafe7bdfbce!2m2!1d31.3310337!2d30.0965551?entry=ttu&g_ep=EgoyMDI1MDEwOC4wIKXMDSoASAFQAw%3D%3D'"
+                                   target="_blank"
+                                   class="btn btn-success btn-sm ms-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-whatsapp" viewBox="0 0 16 16">
+                                        <path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.6 6.6 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592m3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232"/>
+                                    </svg>
+                                    إرسال واتساب
+                                </a>
+                                <a th:href="@{/admin/sms/send/{id}(id=${patient.id})}"
+                                   class="btn btn-primary btn-sm ms-2">
+                                    إرسال SMS
+                                </a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Reservations Section -->
+            <div id="reservation-details" class="card mt-4">
+                <div class="card-header bg-dark text-white">
+                    الحجوزات
+                </div>
+                <div class="card-body">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>الدور</th>
+                            <th>تاريخ الحجز</th>
+                            <th>اسم العيادة</th>
+                            <th>النوع </th>
+                            <th>الإجراءات</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="reservation : ${patient.reservations}">
+                            <td th:text="${reservation.turn}"></td>
+                            <td th:text="${reservation.date}"></td>
+                            <td th:text="${reservation.clinicName}"></td>
+                            <td th:text="${reservation.type}"></td>
+                            <td>
+                                <a th:href="@{/admin/reservations/edit/{id}(id=${reservation.id})}" class="btn btn-primary btn-sm">تعديل</a>
+                                <a th:href="@{/admin/reservations/delete/{id}(id=${reservation.id})}" class="btn btn-danger btn-sm">حذف</a>
+                            </td>
+                        </tr>
+                        <tr th:if="${patient.reservations.size() == 0}">
+                            <td colspan="4" class="text-center">لا توجد حجوزات</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <a style="background-color: black" th:href="@{/admin/reservations/add?patientId={id}(id=${patient.id})}" class="btn btn-success btn-sm">حجز جديد</a>
+                </div>
+            </div>
+
+            <div id="test-details" class="card mt-4">
+                <div class="card-header bg-danger text-white">
+                    التحاليل المطلوبة
+                </div>
+                <div class="card-body">
+                    <table class="table table-striped" th:if="${patient.labTests != null and patient.labTests.size() > 0}">
+                        <thead>
+                        <tr>
+                            <th>اسم التحليل</th>
+                            <th>النتيجة</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="test : ${patient.labTests}">
+                            <td th:text="${test.name}"></td>
+                            <td th:text="${test.result}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <p th:if="${patient.labTests.size() == 0}" class="text-center">لا توجد تحاليل مطلوبة</p>
+                    <a style="background-color: red" th:href="@{/admin/labs/add?patientId={id}(id=${patient.id})}" class="btn btn-success btn-sm"> اضف تحليل</a>
+
+                </div>
+            </div>
+
+
+            <!-- Next Follow-Up Section -->
+            <div class="card mt-4">
+                <div class="card-header bg-secondary text-white">
+                    المتابعة القادمة
+                </div>
+                <div class="card-body">
+                    <p th:if="${patient.nextFollowUp != null}">
+                        <strong>التاريخ المتوقع للمتابعة:</strong>
+                        <span th:text="${patient.nextFollowUp}"></span>
+                    </p>
+                    <p th:if="${patient.nextFollowUp == null}">
+                        لا توجد متابعة قادمة مخصصة للمريض.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Back Button -->
+            <a href="/admin/patients" class="btn btn-secondary mt-4">رجوع</a>
+        </div>
+    </div>
+</div>
+
+<footer class="footer">
+    <p>© 2024 نظام العيادة. جميع الحقوق محفوظة.</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Select the tracking step element by its id (e.g., tracking-step-1)
+    document.getElementById('tracking-step-1').addEventListener('click', function() {
+        // Scroll to the patient details section
+        document.getElementById('patient-details').scrollIntoView({ behavior: 'smooth' });
+    });
+    // Select the tracking step element by its id (e.g., tracking-step-1)
+    document.getElementById('tracking-step-2').addEventListener('click', function() {
+        // Scroll to the patient details section
+        document.getElementById('reservation-details').scrollIntoView({ behavior: 'smooth' });
+    });
+
+    document.getElementById('tracking-step-3').addEventListener('click', function() {
+        // Scroll to the patient details section
+        document.getElementById('test-details').scrollIntoView({ behavior: 'smooth' });
+    });
+</script>
+</body>
+</html>

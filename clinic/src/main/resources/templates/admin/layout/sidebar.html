@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>نظام العيادة</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+        }
+        .sidebar {
+            background-color: #343a40;
+            color: white;
+            height: 100vh;
+        }
+        .sidebar * {
+            color: white; /* Ensures all text inside the sidebar has the same color */
+        }
+        .nav-link {
+            text-align: right;
+        }
+        .nav-link:hover {
+            color: #ffc107;
+        }
+    </style>
+</head>
+<body>
+<nav th:fragment="sidebar" class="sidebar d-flex flex-column">
+
+    <ul class="nav flex-column">
+        <li class="nav-item">
+            <a class="nav-link" href="/admin/" th:href="@{/admin/}">لوحة التحكم</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/admin/patients/" th:href="@{/admin/patients/}">المرضى</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/admin/reservations/" th:href="@{/admin/reservations/}">الحجوزات</a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link" href="/admin/labs/" th:href="@{/admin/labs/}">التحاليل</a>
+        </li>
+    </ul>
+</nav>
+</body>
+</html>

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ar" dir="rtl">
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <style>
+        .footer {
+            background-color: #343a40;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+
+        .btn {
+            direction: rtl;
+        }
+
+        #chairs-container {
+            gap: 10px;
+        }
+
+        .chair {
+            width: 50px;
+            height: 50px;
+            background-color: #f0f0f0;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .chair:hover {
+            background-color: #007bff;
+            color: white;
+            border-color: #0056b3;
+        }
+
+        .chair.selected {
+            background-color: #28a745;
+            color: white;
+            border-color: #1e7e34;
+        }
+
+        .chair.disabled {
+            background-color: #dc3545;
+            color: white;
+            border-color: #bd2130;
+            cursor: not-allowed;
+        }
+    </style>
+    <title>إضافة حجز</title>
+</head>
+<body>
+
+<!-- Navbar -->
+<div th:replace="admin/layout/navbar :: navbar"></div>
+
+<div class="container mt-5">
+    <h1>إضافة حجز جديد</h1>
+    <div>
+        <!-- Reservation Form -->
+        <form th:action="@{/admin/reservations/}" method="post" onsubmit="return validateForm()">
+            <div class="mb-3">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="patientId" class="form-label">اختر مريضاً:</label>
+                        <input type="text" id="patientName" class="form-control"
+                               th:value="${reservation.patient != null ? reservation.patient.name : ''}"
+                               placeholder="اسم المريض" readonly>
+                        <input type="hidden" id="patientId" name="patient.id"
+                               th:value="${reservation.patient != null ? reservation.patient.id : ''}">
+                    </div></div></div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label for="date">تاريخ الحجز</label>
+                        <input type="text" id="date" name="date" class="form-control" placeholder="اختر تاريخ الحجز" required>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label for="turn">اختر الدور</label>
+                        <div id="chairs-container" class="d-flex flex-wrap">
+                            <!-- Chairs will be generated dynamically -->
+                        </div>
+                        <input type="hidden" id="turn" name="turn" required>
+                    </div>
+                </div></div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+
+                    <div class="form-group mb-3">
+                        <label for="clinicName">اسم العيادة</label>
+                        <input type="text" id="clinicName" name="clinicName" class="form-control" required>
+                    </div>
+                </div></div>
+            <!-- Reservation Type -->
+            <div class="mb-3"> <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="type" class="form-label">النوع</label>
+                    <select id="type" name="type" class="form-select" required>
+                        <option value="كشف">كشف</option>
+                        <option value="استشارة">استشارة</option>
+                    </select>
+                </div>
+            </div>        </div>
+
+
+            <button type="submit" class="btn btn-primary mt-3">إضافة حجز</button>
+        </form>
+    </div>
+    <!-- Error Message (if any) -->
+    <div th:if="${error}" class="alert alert-danger mt-3" role="alert">
+        <span th:text="${error}"></span>
+    </div>
+
+    <!-- Success Message (if any) -->
+    <div th:if="${message}" class="alert alert-success mt-3" role="alert">
+        <span th:text="${message}"></span>
+    </div>
+</div>
+
+<footer class="footer">
+    <p>© 2024 نظام العيادة. جميع الحقوق محفوظة.</p>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const dateInput = document.getElementById('date');
+        const container = document.getElementById('chairs-container');
+        const turnInput = document.getElementById('turn');
+        const totalChairs = 30; // Number of available turns/chairs
+        let selectedChair = null;
+
+        // Set up Flatpickr for the date input
+        flatpickr("#date", {
+            minDate: "today", // Disable past dates
+            disable: [
+                function (date) {
+                    // Disable Fridays (day 5)
+                    return date.getDay() === 5;
+                }
+            ],
+            onChange: function (selectedDates, dateStr) {
+                if (selectedDates.length) {
+                    loadReservedTurns(dateStr);
+                }
+            },
+            locale: {
+                firstDayOfWeek: 6,
+                weekdays: {
+                    shorthand: ["أحد", "إثنين", "ثلاثاء", "أربعاء", "خميس", "جمعة", "سبت"],
+                    longhand: ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"]
+                },
+                months: {
+                    shorthand: ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"],
+                    longhand: ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"]
+                }
+            }
+        });
+
+        // Load reserved turns for the selected date
+        async function loadReservedTurns(date) {
+            try {
+                const response = await fetch(`http://localhost:8080/admin/reservations/reserved-turns?date=${date}`);
+                const reservedTurns = await response.json();
+
+                // Generate chairs dynamically and mark reserved ones
+                container.innerHTML = ''; // Clear existing chairs
+                for (let i = 1; i <= totalChairs; i++) {
+                    const chair = document.createElement('div');
+                    chair.className = 'chair';
+                    chair.textContent = i;
+                    chair.dataset.value = i;
+
+                    // Disable chair if it's reserved
+                    if (reservedTurns.includes(i)) {
+                        chair.classList.add('disabled');
+                    } else {
+                        // Add click event to select the chair
+                        chair.addEventListener('click', function () {
+                            if (selectedChair) {
+                                selectedChair.classList.remove('selected');
+                            }
+                            selectedChair = this;
+                            this.classList.add('selected');
+                            turnInput.value = this.dataset.value; // Set the hidden input value
+                        });
+                    }
+
+                    container.appendChild(chair);
+                }
+            } catch (error) {
+                console.error('Error loading reserved turns:', error);
+                alert('حدث خطأ أثناء تحميل الأدوار المحجوزة.');
+            }
+        }
+
+        // Validate form before submission
+        function validateForm() {
+            if (!turnInput.value) {
+                alert('يرجى اختيار الدور.');
+                return false;
+            }
+            return true;
+        }
+    });
+</script>
+</body>
+</html>
