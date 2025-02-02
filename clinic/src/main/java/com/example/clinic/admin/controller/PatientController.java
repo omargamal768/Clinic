@@ -9,6 +9,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.List;
+
 @Controller
 @RequestMapping("/admin/patients")
 public class PatientController {
@@ -18,6 +20,13 @@ public class PatientController {
     @Autowired
     public PatientController(PatientService patientService) {
         this.patientService = patientService;
+    }
+
+
+    @GetMapping("/list")
+    @ResponseBody
+    public List<Patient> getPatientsList() {
+        return patientService.getAllPatients();
     }
 
     // Display all patients

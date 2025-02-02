@@ -125,81 +125,50 @@
 <!-- Bootstrap JS and dependencies -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        fetchPatients();
+    });
 
-    // Sample data for patients and reservations
-    const patients = [
-        {
-            id: 1,
-            name: 'عمر جمال الدين',
-            mobile: '+201114899956',
-            reservations: [
-                {
-                    id: 1,
-                    turn: 1,
-                    date: '2025-01-29',
-                    clinicName: 'clinic',
-                    type: 'كشف',
-                    dayOfWeek: 'Wednesday',
-                },
-                {
-                    id: 2,
-                    turn: 2,
-                    date: '2025-02-02',
-                    clinicName: 'clinic',
-                    type: 'استشارة',
-                    dayOfWeek: 'Sunday',
-                },
-                {
-                    id: 3,
-                    turn: 3,
-                    date: '2025-02-05',
-                    clinicName: 'Dental Clinic',
-                    type: 'كشف',
-                    dayOfWeek: 'Wednesday',
-                },
-                {
-                    id: 4,
-                    turn: 4,
-                    date: '2025-02-10',
-                    clinicName: 'Heart Clinic',
-                    type: 'استشارة',
-                    dayOfWeek: 'Monday',
-                },
-                {
-                    id: 5,
-                    turn: 5,
-                    date: '2025-02-15',
-                    clinicName: 'Eye Clinic',
-                    type: 'كشف',
-                    dayOfWeek: 'Saturday',
-                }
-            ]
+    // Function to fetch patients from API
+    async function fetchPatients() {
+        try {
+            const response = await fetch("http://localhost:8080/admin/patients/list");
+            if (!response.ok) {
+                throw new Error("Failed to fetch patients.");
+            }
+
+            const patients = await response.json();
+            updateDashboard(patients); // Default: show all reservations
+        } catch (error) {
+            console.error("Error fetching patients:", error);
+            alert("حدث خطأ أثناء تحميل البيانات!");
         }
-    ];
+    }
 
     // Function to filter reservations by date range
-    // Function to filter reservations by date range
-    function filterReservations(startDate, endDate) {
+    function filterReservations(patients, startDate, endDate) {
+        if (!startDate || !endDate) {
+            // If no dates are selected, return all reservations
+            return patients.flatMap(patient => patient.reservations);
+        }
+
         const start = new Date(startDate);
         const end = new Date(endDate);
 
-        return patients[0].reservations.filter(reservation => {
-            const reservationDate = new Date(reservation.date);
-            return reservationDate >= start && reservationDate <= end;
-        });
+        return patients.flatMap(patient =>
+            patient.reservations.filter(reservation => {
+                const reservationDate = new Date(reservation.date);
+                return reservationDate >= start && reservationDate <= end;
+            })
+        );
     }
 
-    // Function to update reservation count and patient count
-    function updateDashboard(startDate = null, endDate = null) {
-        let filteredReservations = patients[0].reservations;
+    // Function to update the dashboard
+    function updateDashboard(patients, startDate = null, endDate = null) {
+        const filteredReservations = filterReservations(patients, startDate, endDate);
 
-        // Filter reservations if dates are provided
-        if (startDate && endDate) {
-            filteredReservations = filterReservations(startDate, endDate);
-        }
-
-        // Handle empty state
-        if (filteredReservations.length === 0) {
+        // Show alert only if the user selected dates and no reservations were found
+        if (startDate && endDate && filteredReservations.length === 0) {
             alert('لا توجد حجوزات في الفترة الزمنية المحددة.');
         }
 
@@ -208,7 +177,7 @@
         const totalConsultationReservations = filteredReservations.filter(reservation => reservation.type === 'كشف').length;
         const totalFollowUpReservations = filteredReservations.filter(reservation => reservation.type === 'استشارة').length;
 
-        // Update the cards with the filtered data
+        // Update the dashboard with the calculated data
         document.getElementById('totalPatients').innerText = totalPatients;
         document.getElementById('consultationReservations').innerText = totalConsultationReservations;
         document.getElementById('followUpReservations').innerText = totalFollowUpReservations;
@@ -232,14 +201,15 @@
             return;
         }
 
-        // Update dashboard with filtered data
-        updateDashboard(startDate, endDate);
+        // Fetch the patients and update dashboard with filtered data
+        fetchPatients().then(patients => updateDashboard(patients, startDate, endDate));
     });
 
-    // Initial update of the dashboard
+    // Initial fetch of the patients and dashboard update
     window.onload = () => {
-        updateDashboard();
+        fetchPatients();
     };
+
 </script>
 
     </body>
