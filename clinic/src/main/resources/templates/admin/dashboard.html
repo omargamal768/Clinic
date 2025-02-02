@@ -134,7 +134,7 @@
         try {
             const response = await fetch("http://localhost:8080/admin/patients/list");
             if (!response.ok) {
-                throw new Error("Failed to fetch patients.");
+                throw  new Error("Failed to fetch patients.");
             }
 
             const patients = await response.json();
